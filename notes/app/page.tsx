@@ -92,6 +92,12 @@ useEffect(() => {
     }
   }
 
+    function deleteNote(id: string) {
+    setNotes((previousNotes) =>
+      previousNotes.filter((note) => note.id !== id)
+    );
+  }
+
   const allTags = [
   ...new Set(notes.flatMap((note) => note.tags)),
   ].sort();
@@ -228,6 +234,15 @@ useEffect(() => {
                 <h3 className="break-words text-lg font-semibold">
                   {note.title}
                 </h3>
+
+                <button
+                    type="button"
+                    onClick={() => deleteNote(note.id)}
+                    aria-label={`Delete note: ${note.title}`}
+                    className="mt-2 rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                  >
+                   Delete
+                </button>
 
                 <div className="note-markdown mt-3 break-words text-slate-700">
                 <ReactMarkdown>{note.body}</ReactMarkdown>
