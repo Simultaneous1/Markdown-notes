@@ -180,7 +180,7 @@ useEffect(() => {
             <button
               type="submit"
               disabled={saving || !loaded}
-              className="rounded-lg bg-teal-700 px-5 py-3 font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
+              className="w-full sm:w-auto rounded-lg bg-teal-700 px-5 py-3 font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
             >
               {saving ? "Adding..." : "Add note"}
             </button>
