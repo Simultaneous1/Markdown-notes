@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { checkNote } from "./actions";
 
 type Note = {
@@ -14,6 +14,53 @@ export default function Home() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+useEffect(() => {
+  try {
+    const saved = localStorage.getItem("markdown-notes");
+
+    if (saved) {
+      const parsed: unknown = JSON.parse(saved);
+
+      if (
+        !Array.isArray(parsed) ||
+        !parsed.every(
+          (note) =>
+            note !== null &&
+            typeof note === "object" &&
+            typeof note.id === "string" &&
+            typeof note.title === "string" &&
+            typeof note.body === "string" &&
+            Array.isArray(note.tags) &&
+            note.tags.every((tag: unknown) => typeof tag === "string")
+        )
+      ) {
+        throw new Error("Invalid saved notes");
+      }
+
+      setNotes(parsed as Note[]);
+    }
+
+    setLoaded(true);
+  } catch {
+    setError(
+      "Saved notes could not be loaded. Please avoid adding notes until this is resolved."
+    );
+  }
+}, []);
+
+useEffect(() => {
+  if (!loaded) return;
+
+  try {
+    localStorage.setItem("markdown-notes", JSON.stringify(notes));
+  } catch {
+    setError(
+      "Your latest changes could not be saved in this browser. Please keep this page open."
+    );
+  }
+}, [notes, loaded]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -108,7 +155,7 @@ export default function Home() {
 
             <button
               type="submit"
-              disabled={saving}
+              disabled={saving || !loaded}
               className="rounded-lg bg-teal-700 px-5 py-3 font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
             >
               {saving ? "Adding..." : "Add note"}
