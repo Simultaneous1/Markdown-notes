@@ -15,6 +15,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
 useEffect(() => {
   try {
@@ -89,6 +90,14 @@ useEffect(() => {
       setSaving(false);
     }
   }
+
+  const allTags = [
+  ...new Set(notes.flatMap((note) => note.tags)),
+  ].sort();
+ 
+  const filteredNotes = selectedTag
+  ? notes.filter((note) => note.tags.includes(selectedTag))
+  : notes;
 
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-10 text-slate-900">
@@ -168,6 +177,14 @@ useEffect(() => {
             Your notes ({notes.length})
           </h2>
 
+        <button
+          type="button"
+          onClick={() => setSelectedTag(null)}
+          className="mb-5 rounded-full bg-teal-700 px-4 py-2 text-sm text-white"
+        >
+          All
+        </button> 
+
           <div aria-live="polite" className="space-y-4">
             {notes.length === 0 && (
               <p className="text-slate-500">
@@ -175,7 +192,7 @@ useEffect(() => {
               </p>
             )}
 
-            {notes.map((note) => (
+            {filteredNotes.map((note) => (
               <article
                 key={note.id}
                 className="rounded-2xl border border-slate-200 bg-white p-6"
@@ -190,12 +207,14 @@ useEffect(() => {
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   {note.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="max-w-full break-words rounded-full bg-teal-50 px-3 py-1 text-sm text-teal-800"
-                    >
-                      {tag}
-                    </span>
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => setSelectedTag(tag)}
+                  className="max-w-full break-words rounded-full bg-teal-50 px-3 py-1 text-sm text-teal-800 hover:bg-teal-100"
+                >
+                  {tag}
+                </button>
                   ))}
                 </div>
               </article>
