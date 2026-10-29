@@ -1,5 +1,5 @@
 "use client";
-
+import ReactMarkdown from "react-markdown";   
 import { useEffect, useState, type FormEvent } from "react";
 import { checkNote } from "./actions";
 
@@ -184,9 +184,9 @@ useEffect(() => {
                   {note.title}
                 </h3>
 
-                <p className="mt-3 whitespace-pre-wrap break-words text-slate-700">
-                  {note.body}
-                </p>
+                <div className="note-markdown mt-3 break-words text-slate-700">
+                <ReactMarkdown>{note.body}</ReactMarkdown>
+                </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
                   {note.tags.map((tag) => (
