@@ -16,6 +16,7 @@ export default function Home() {
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
 useEffect(() => {
   try {
@@ -95,10 +96,18 @@ useEffect(() => {
   ...new Set(notes.flatMap((note) => note.tags)),
   ].sort();
  
-  const filteredNotes = selectedTag
-  ? notes.filter((note) => note.tags.includes(selectedTag))
-  : notes;
+  const filteredNotes = notes.filter((note) => {
+  const matchesTag =
+    selectedTag === null || note.tags.includes(selectedTag);
 
+  const query = searchQuery.trim().toLowerCase();
+
+  const matchesSearch =
+    note.title.toLowerCase().includes(query) ||
+    note.body.toLowerCase().includes(query);
+
+  return matchesTag && matchesSearch;
+});
   return (
     <main className="min-h-screen bg-slate-50 px-5 py-10 text-slate-900">
       <div className="mx-auto max-w-3xl">
@@ -177,6 +186,24 @@ useEffect(() => {
             Your notes ({notes.length})
           </h2>
 
+        <div className="mb-5">
+          <label
+            htmlFor="search"
+            className="mb-2 block font-medium"
+          >
+            Search notes
+          </label>
+
+          <input
+            id="search"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search titles or note contents..."
+            className="w-full rounded-lg border border-slate-300 bg-white p-3"
+          />
+        </div>
+
         <button
           type="button"
           onClick={() => setSelectedTag(null)}
@@ -186,12 +213,13 @@ useEffect(() => {
         </button> 
 
           <div aria-live="polite" className="space-y-4">
-            {notes.length === 0 && (
-              <p className="text-slate-500">
-                No notes yet. Add your first note above.
-              </p>
-            )}
-
+           {filteredNotes.length === 0 && (
+          <p className="text-slate-500">
+            {notes.length === 0
+              ? "No notes yet. Add your first note above."
+              : "No notes match."}
+          </p>
+        )}
             {filteredNotes.map((note) => (
               <article
                 key={note.id}
